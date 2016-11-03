@@ -1,5 +1,6 @@
 package com.cjon.book.service;
 
+import com.cjon.book.common.InsertFormat;
 import com.cjon.book.dao.BookDAO;
 
 public class BookService {
@@ -17,9 +18,9 @@ public class BookService {
 		return result;
 	}
 
-	public boolean updateBook(String isbn, String price) {
+	public boolean updateBook(String isbn, String title, String author, String price) {
 		BookDAO dao = new BookDAO();
-		boolean result = dao.update(isbn,price);	
+		boolean result = dao.update(isbn, title, author, price);	
 		return result;
 	}
 
@@ -27,6 +28,35 @@ public class BookService {
 
 		BookDAO dao=new BookDAO();
 		boolean result=dao.delete(isbn);
+		
+		return result;
+	}
+
+	public boolean insertBook(InsertFormat inf) {
+		
+		BookDAO dao=new BookDAO();
+		boolean result=dao.insert(inf);
+		
+		return result;
+	}
+
+	public String detailBook(String isbn) {
+		BookDAO dao=new BookDAO();
+		String result=dao.detail(isbn);
+		
+		return result;
+	}
+
+	public boolean joinBook(String id, String pw) {
+		BookDAO dao=new BookDAO();
+		boolean result=dao.join(id, pw);
+		
+		return result;
+	}
+
+	public boolean loginBook(String id, String pw) {
+		BookDAO dao=new BookDAO();
+		boolean result=dao.login(id, pw);
 		
 		return result;
 	}

@@ -8,42 +8,38 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.cjon.book.service.BookService;
 
-
-@WebServlet("/bookUpdate")
-public class BookUpdateServlet extends HttpServlet {
+@WebServlet("/bookLogin")
+public class BookLoginServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// 1. 입력받고
-		String isbn = request.getParameter("isbn");
-		String title = request.getParameter("title");
-		String author = request.getParameter("author");
-		String price = request.getParameter("price");
+		
+		String id=request.getParameter("id");
+		String pw=request.getParameter("pw");
 		String callback = request.getParameter("callback");
-		// 2. 로직처리
-		BookService service = new BookService();
-		boolean result = service.updateBook(isbn, title, author, price);
-		// 3. 출력처리
+
+		BookService service = new BookService();		
+		boolean result = service.loginBook(id, pw);
+		
+		if(result) {
+			HttpSession session = request.getSession(true);
+			session.setAttribute("id", id);
+		}
+				
 		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();
 		out.println(callback + "(" + result + ")");
 		out.flush();
 		out.close();
+		
+		
+		
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-	}
+
 
 }
-
-
-
-
-
-
-
-
-

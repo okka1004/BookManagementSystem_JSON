@@ -8,6 +8,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.cjon.book.common.DBTemplate;
+import com.cjon.book.common.InsertFormat;
 
 public class BookDAO {
 
@@ -23,7 +24,7 @@ public class BookDAO {
 		ResultSet rs = null;
 		String result = null;
 		try {
-			String sql = "select bisbn, bimgurl, btitle, bauthor, bprice "
+			String sql = "select bisbn, bimgbase64, btitle, bauthor, bprice "
 					   + "from book where btitle like ?";
 			pstmt= con.prepareStatement(sql);
 			pstmt.setString(1, "%" + keyword + "%");
@@ -32,7 +33,7 @@ public class BookDAO {
 			while(rs.next()) {
 				JSONObject obj = new JSONObject();
 				obj.put("isbn", rs.getString("bisbn"));
-				obj.put("img", rs.getString("bimgurl"));
+				obj.put("base64", rs.getString("bimgbase64"));
 				obj.put("title", rs.getString("btitle"));
 				obj.put("author", rs.getString("bauthor"));
 				obj.put("price", rs.getString("bprice"));
@@ -49,18 +50,22 @@ public class BookDAO {
 		return result;
 	}
 
-	public boolean update(String isbn, String price) {
+	public boolean update(String isbn, String title, String author, String price) {
 		Connection con = DBTemplate.getConnection();
 		PreparedStatement pstmt = null;
 		
 		boolean result = false;
 		try {
 			System.out.println(isbn);
+			System.out.println(title);
+			System.out.println(author);
 			System.out.println(price);
-			String sql = "update book set bprice=? where bisbn=?";
+			String sql = "update book set btitle=?, bauthor=?, bprice=? where bisbn=?";
 			pstmt= con.prepareStatement(sql);
-			pstmt.setInt(1, Integer.parseInt(price));
-			pstmt.setString(2, isbn);
+			pstmt.setString(1, title);
+			pstmt.setString(2, author);
+			pstmt.setInt(3, Integer.parseInt(price));
+			pstmt.setString(4, isbn);
 			
 			int count = pstmt.executeUpdate();
 			// 결과값은 영향을 받은 레코드의 수
@@ -110,6 +115,178 @@ public class BookDAO {
 			DBTemplate.close(con);
 		} 
 		return result;
+	}
+
+	public boolean insert(InsertFormat inf) {
+		
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		
+		boolean result = false;
+		try {
+			String isbn=inf.getIsbn();
+			String title=inf.getTitle();
+			String author=inf.getAuthor();
+			String price=inf.getPrice();
+			String date=inf.getDate();
+			String page=inf.getPage();
+			String translator=inf.getTranslator();
+			String supplement=inf.getSupplement();
+			String imgurl=inf.getImgurl();
+			String publisher=inf.getPublisher();
+			String imgbase64=inf.getImgbase64();
+			
+			
+			
+			String sql = "insert into book(bisbn, btitle, bdate, bpage, bprice, bauthor, "
+					+ "btranslator, bsupplement, bpublisher, bimgurl, bimgbase64)"
+					+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, isbn);
+			pstmt.setString(2, title);
+			pstmt.setString(3, date);
+			pstmt.setInt(4, Integer.parseInt(page));
+			pstmt.setInt(5, Integer.parseInt(price));
+			pstmt.setString(6, author);
+			pstmt.setString(7, translator);
+			pstmt.setString(8, supplement);
+			pstmt.setString(9, publisher);
+			pstmt.setString(10, imgurl);
+			pstmt.setString(11, imgbase64);
+			
+			int count = pstmt.executeUpdate();
+			
+			// 결과값은 영향을 받은 레코드의 수
+			if( count == 1 ) {
+				result = true;
+				// 정상처리이기 때문에 commit
+				DBTemplate.commit(con);
+			} else {
+				DBTemplate.rollback(con);
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		return result;
+		
+	}
+
+	public String detail(String isbn) {
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String result = null;
+		try {
+			String sql = "select bpage, bdate, btranslator, bsupplement, bpublisher from book where bisbn=?";
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, isbn);
+			rs = pstmt.executeQuery();
+			JSONObject obj;
+			while(rs.next()) {
+				obj = new JSONObject();
+				obj.put("page", rs.getString("bpage"));
+				obj.put("date", rs.getString("bdate"));
+				obj.put("translator", rs.getString("btranslator"));
+				obj.put("supplement", rs.getString("bsupplement"));
+				obj.put("publisher", rs.getString("bpublisher"));
+				
+				result = obj.toJSONString();
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(rs);
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		
+		return result;
+	}
+
+	public boolean join(String id, String pw) {
+		
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		
+		boolean result = false;
+		try {
+		
+			String sql = "insert into Member(id, password) values (?, ?)";
+			
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, pw);
+			
+			int count = pstmt.executeUpdate();
+			
+			// 결과값은 영향을 받은 레코드의 수
+			if( count == 1 ) {
+				result = true;
+				// 정상처리이기 때문에 commit
+				DBTemplate.commit(con);
+			} else {
+				DBTemplate.rollback(con);
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		return result;
+		
+		
+	}
+
+	public boolean login(String id, String pw) {
+		
+		
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String result = null;
+		boolean myResult=false;
+		try {
+			String sql = "select id, password from member where id=? AND password=?";
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, pw);
+			rs = pstmt.executeQuery();
+			
+			JSONObject obj;
+			
+			while(rs.next()) {
+				obj = new JSONObject();
+				obj.put("id", rs.getString("id"));
+				obj.put("pw", rs.getString("password"));
+				
+				result = obj.toJSONString();
+			}
+			
+			if(result!=null){
+				myResult=true;
+			}
+			else{
+				myResult=false;
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(rs);
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		
+		return myResult;
+		
 	}
 
 }
