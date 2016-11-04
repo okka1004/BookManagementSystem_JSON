@@ -8,38 +8,28 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import com.cjon.book.service.BookService;
 
 
-@WebServlet("/bookLogout")
-public class BookLogoutServlet extends HttpServlet {
+@WebServlet("/bookRent")
+public class BookRentServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		
-		
-		String callback = request.getParameter("callback");
-		boolean result=false;
-		
-		HttpSession session=request.getSession(true);
-		
-		String id = (String)session.getAttribute("id");
-		
-		if( id == null ) {
-			System.out.println("세션이 존재하지 않아");
-			session.invalidate();
-		}
-		else{
-	        session.invalidate();
-	        result=true;
-		}
+		String isbn = request.getParameter("isbn");
+		String id = request.getParameter("id"); // 책에 대한 keyword를 받는부분
+		String callback = request.getParameter("callback"); // JSONP처리를 위해서 사용
 
-        response.setContentType("text/plain; charset=utf8");
+		BookService service = new BookService();		
+		boolean result = service.rentBook(isbn, id);
+
+		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();
 		out.println(callback + "(" + result + ")");
 		out.flush();
 		out.close();
-		
 	}
+
+
 
 }

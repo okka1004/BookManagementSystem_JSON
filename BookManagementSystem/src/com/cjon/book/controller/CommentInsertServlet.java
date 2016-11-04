@@ -8,38 +8,34 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import com.cjon.book.service.CommentService;
 
 
-@WebServlet("/bookLogout")
-public class BookLogoutServlet extends HttpServlet {
+@WebServlet("/commentInsert")
+public class CommentInsertServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		System.out.println("서평이 들어왕");
+		
+		String comment=request.getParameter("comment");
+		String isbn=request.getParameter("isbn");
+		String id=request.getParameter("id");
 		
 		
 		
 		String callback = request.getParameter("callback");
-		boolean result=false;
 		
-		HttpSession session=request.getSession(true);
-		
-		String id = (String)session.getAttribute("id");
-		
-		if( id == null ) {
-			System.out.println("세션이 존재하지 않아");
-			session.invalidate();
-		}
-		else{
-	        session.invalidate();
-	        result=true;
-		}
+		CommentService service = new CommentService();
+		boolean result = service.insertComment(isbn, id, comment);
 
-        response.setContentType("text/plain; charset=utf8");
+		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();
 		out.println(callback + "(" + result + ")");
 		out.flush();
 		out.close();
-		
 	}
+
 
 }

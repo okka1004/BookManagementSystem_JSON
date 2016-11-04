@@ -8,38 +8,26 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import com.cjon.book.dao.RentService;
 
 
-@WebServlet("/bookLogout")
-public class BookLogoutServlet extends HttpServlet {
+@WebServlet("/showRentId")
+public class BookRentIdServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		
-		
+		String isbn = request.getParameter("isbn");
 		String callback = request.getParameter("callback");
-		boolean result=false;
-		
-		HttpSession session=request.getSession(true);
-		
-		String id = (String)session.getAttribute("id");
-		
-		if( id == null ) {
-			System.out.println("세션이 존재하지 않아");
-			session.invalidate();
-		}
-		else{
-	        session.invalidate();
-	        result=true;
-		}
 
-        response.setContentType("text/plain; charset=utf8");
+		RentService service = new RentService();		
+		String result = service.rentId(isbn);
+
+		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();
 		out.println(callback + "(" + result + ")");
 		out.flush();
 		out.close();
-		
 	}
+
 
 }

@@ -24,7 +24,7 @@ public class BookDAO {
 		ResultSet rs = null;
 		String result = null;
 		try {
-			String sql = "select bisbn, bimgbase64, btitle, bauthor, bprice "
+			String sql = "select bisbn, bimgbase64, btitle, bauthor, bprice, rent "
 					   + "from book where btitle like ?";
 			pstmt= con.prepareStatement(sql);
 			pstmt.setString(1, "%" + keyword + "%");
@@ -37,6 +37,7 @@ public class BookDAO {
 				obj.put("title", rs.getString("btitle"));
 				obj.put("author", rs.getString("bauthor"));
 				obj.put("price", rs.getString("bprice"));
+				obj.put("rent", rs.getString("rent"));
 				arr.add(obj);
 			}
 			result = arr.toJSONString();
@@ -182,18 +183,24 @@ public class BookDAO {
 		ResultSet rs = null;
 		String result = null;
 		try {
-			String sql = "select bpage, bdate, btranslator, bsupplement, bpublisher from book where bisbn=?";
+			String sql = "select btitle, bauthor, bprice, bimgbase64, bpage, bdate, btranslator, bsupplement, bpublisher from book where bisbn=?";
 			pstmt= con.prepareStatement(sql);
 			pstmt.setString(1, isbn);
 			rs = pstmt.executeQuery();
 			JSONObject obj;
 			while(rs.next()) {
 				obj = new JSONObject();
+				obj.put("title", rs.getString("btitle"));
+				obj.put("author", rs.getString("bauthor"));
+				obj.put("price", rs.getString("bprice"));
+				obj.put("base64", rs.getString("bimgbase64"));
+				
 				obj.put("page", rs.getString("bpage"));
 				obj.put("date", rs.getString("bdate"));
 				obj.put("translator", rs.getString("btranslator"));
 				obj.put("supplement", rs.getString("bsupplement"));
 				obj.put("publisher", rs.getString("bpublisher"));
+				
 				
 				result = obj.toJSONString();
 			}
@@ -286,6 +293,39 @@ public class BookDAO {
 		} 
 		
 		return myResult;
+		
+	}
+
+	public boolean rent(String isbn, String id) {
+		
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		
+		boolean result = false;
+		try {
+		
+			String sql = "update book set rent=? where bisbn=?";
+			
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, isbn);
+			
+			int count = pstmt.executeUpdate();
+			
+			if( count == 1 ) {
+				result = true;
+				DBTemplate.commit(con);
+			} else {
+				DBTemplate.rollback(con);
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		return result;
 		
 	}
 

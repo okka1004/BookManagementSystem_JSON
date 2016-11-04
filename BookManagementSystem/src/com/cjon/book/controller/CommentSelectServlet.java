@@ -8,38 +8,30 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import com.cjon.book.service.CommentService;
 
 
-@WebServlet("/bookLogout")
-public class BookLogoutServlet extends HttpServlet {
+@WebServlet("/commentShowAll")
+public class CommentSelectServlet extends HttpServlet {
 
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		System.out.println("commentShowAll이 들어왕");
 		
-		
-		String callback = request.getParameter("callback");
-		boolean result=false;
-		
-		HttpSession session=request.getSession(true);
-		
-		String id = (String)session.getAttribute("id");
-		
-		if( id == null ) {
-			System.out.println("세션이 존재하지 않아");
-			session.invalidate();
-		}
-		else{
-	        session.invalidate();
-	        result=true;
-		}
+		String isbn=request.getParameter("isbn");
 
-        response.setContentType("text/plain; charset=utf8");
+		String callback = request.getParameter("callback");
+		
+		CommentService service = new CommentService();
+		String result = service.selectAllComment(isbn);
+
+		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();
 		out.println(callback + "(" + result + ")");
 		out.flush();
 		out.close();
-		
 	}
 
 }

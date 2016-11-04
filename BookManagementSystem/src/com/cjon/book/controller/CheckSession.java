@@ -10,28 +10,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONObject;
 
-@WebServlet("/bookLogout")
-public class BookLogoutServlet extends HttpServlet {
+@WebServlet("/checkSession")
+public class CheckSession extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		
-		
 		String callback = request.getParameter("callback");
-		boolean result=false;
+		String result = null;
 		
 		HttpSession session=request.getSession(true);
 		
-		String id = (String)session.getAttribute("id");
+		JSONObject id = new JSONObject();
+		
+		id.put("id", session.getAttribute("id"));
+		
+		System.out.println("session_id: "+id);
 		
 		if( id == null ) {
 			System.out.println("세션이 존재하지 않아");
-			session.invalidate();
 		}
 		else{
-	        session.invalidate();
-	        result=true;
+			result=id.toJSONString();
+			System.out.println("세션이 존재해");
+			System.out.println("result : "+result);
 		}
 
         response.setContentType("text/plain; charset=utf8");

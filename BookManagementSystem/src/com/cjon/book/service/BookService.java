@@ -60,7 +60,14 @@ public class BookService {
 		
 		return result;
 	}
-	
+
+	public boolean rentBook(String isbn, String id) {
+		BookDAO dao=new BookDAO();
+		boolean result=dao.rent(isbn, id);
+		
+		return result;
+	}
+
 
 
 }
