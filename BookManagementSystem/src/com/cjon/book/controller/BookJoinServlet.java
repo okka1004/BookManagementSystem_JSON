@@ -30,8 +30,5 @@ public class BookJoinServlet extends HttpServlet {
 		out.close();
 		
 	}
-
-
-
-
+	
 }
