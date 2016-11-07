@@ -90,39 +90,7 @@ public class RentDAO {
 		return myResult;
 	}
 
-	public String RentId(String isbn) {
-		Connection con = DBTemplate.getConnection();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String result = null;
-		
-		try {
-			String sql = "select rent from book where bisbn=?";
-			pstmt= con.prepareStatement(sql);
-			pstmt.setString(1, isbn);
-			rs = pstmt.executeQuery();
-			
-			JSONObject obj;
-			while(rs.next()) {
-				obj = new JSONObject();
-				obj.put("rent_id", rs.getString("rent"));
-				
-				result = obj.toJSONString();
-			}
 
-			
-		} catch (Exception e) {
-			System.out.println(e);
-		} finally {
-			DBTemplate.close(rs);
-			DBTemplate.close(pstmt);
-			DBTemplate.close(con);
-		} 
-		
-		System.out.println(result);
-		
-		return result;
-	}
 
 	public boolean returnBook(String id) {
 		

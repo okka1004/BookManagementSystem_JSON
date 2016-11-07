@@ -16,13 +16,6 @@ public class RentService {
 		return result;
 	}
 
-	public String rentId(String isbn) {
-		RentDAO dao=new RentDAO();
-		String result=dao.RentId(isbn);
-		
-		return result;
-	}
-
 	public boolean returnBook(String id) {
 		RentDAO dao=new RentDAO();
 		boolean result=dao.returnBook(id);
